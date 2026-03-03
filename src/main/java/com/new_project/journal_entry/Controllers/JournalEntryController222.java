@@ -59,17 +59,23 @@ public class JournalEntryController222 {
             @PathVariable ObjectId id,
             @RequestBody JournalEntry entry) {
 
-        JournalEntry old = journalEntryServices.findById(id).orElse(null);
-
-        if (old != null) {
-            old.setTitle(entry.getTitle() != null && !entry.getTitle().equals(" ") ? entry.getTitle() : old.getTitle());
-
-            old.setContent(entry.getContent() != null && !entry.getContent().equals(" ") ? entry.getContent()
-                    : old.getContent());
-
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(old);
+        Optional<JournalEntry> optional = journalEntryServices.findById(id);
+        if (optional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        return ResponseEntity.ok(entry);
+        JournalEntry old = optional.get();
+
+        if (entry.getTitle() != null && !entry.getTitle().trim().isEmpty()) {
+            old.setTitle(entry.getTitle());
+        }
+
+        if (entry.getContent() != null && !entry.getContent().trim().isEmpty()) {
+            old.setContent(entry.getContent());
+        }
+
+        journalEntryServices.saveData(old);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(old);
     }
 }
