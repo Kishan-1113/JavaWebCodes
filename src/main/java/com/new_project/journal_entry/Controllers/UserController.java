@@ -4,7 +4,7 @@ package com.new_project.journal_entry.Controllers;
 import java.util.List;
 import java.util.Optional;
 
-import org.bson.types.ObjectId;
+//import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,9 +47,25 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newEntry);
     }
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<UsersEntry> getById(@PathVariable ObjectId id) {
-        return ResponseEntity.status(HttpStatus.FOUND).body(userEntryServices.findById(id).orElse(null));
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UsersEntry> getById(@PathVariable String username) {
+        Optional<UsersEntry> optional = userEntryServices.findUser(username);
+        if (optional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        return ResponseEntity.status(HttpStatus.FOUND).body(userEntryServices.findUser(username).orElse(null));
+    }
+
+    @DeleteMapping("/delete/{user}")
+    public ResponseEntity<UsersEntry> deleteUser(@PathVariable String user) {
+        Optional<UsersEntry> optional = userEntryServices.findUser(user);
+        if (optional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        userEntryServices.delete(optional.get().getId());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
 
     @PutMapping("/update")
