@@ -4,6 +4,8 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +21,7 @@ public class JournalEntryServices {
 
     // saves data to DB, these methods are provided by JournalEntryRepository...
     public void saveData(@NonNull JournalEntry journalEntry) {
+        journalEntry.setDate(LocalDateTime.now());
         if (journalEntry != null)
             journalEntryRepository.save(journalEntry);
     }
