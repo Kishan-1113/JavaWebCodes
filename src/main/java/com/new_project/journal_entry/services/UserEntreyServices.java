@@ -14,6 +14,7 @@ import com.new_project.journal_entry.repo.UserEntryRepository;
 @Component
 public class UserEntreyServices {
 
+    
     @Autowired
     private UserEntryRepository userEntryRepository;
 
