@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.mongodb.lang.NonNull;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 // this is a normal POJO class
@@ -19,6 +20,7 @@ import lombok.Setter;
 @Document(collection = "journal_entries")
 @Getter
 @Setter
+@NoArgsConstructor
 public class JournalEntry {
     @Id
     private ObjectId id;

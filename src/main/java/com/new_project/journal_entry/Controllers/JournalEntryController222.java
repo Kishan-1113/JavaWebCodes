@@ -1,13 +1,12 @@
 package com.new_project.journal_entry.Controllers;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.*;
 //import org.springframework.web.bind.annotation.GetMapping;
 // import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 // import org.springframework.web.bind.annotation.RestController;
 
 import com.new_project.journal_entry.model.JournalEntry;
+import com.new_project.journal_entry.model.UsersEntry;
 import com.new_project.journal_entry.services.JournalEntryServices;
+import com.new_project.journal_entry.services.UserEntreyServices;
 
 // import org.springframework.web.bind.annotation.PostMapping;
 // //import org.springframework.web.bind.annotation.PutMapping;
@@ -29,18 +30,31 @@ public class JournalEntryController222 {
     @Autowired
     private JournalEntryServices journalEntryServices;
 
-    @GetMapping("/entries")
-    public ResponseEntity<List<JournalEntry>> getEntry() {
-        return ResponseEntity.status(HttpStatus.FOUND).body(journalEntryServices.getData());
+    @Autowired
+    private UserEntreyServices userEntreyServices;
+
+    @GetMapping("/entries/{userName}")
+    public ResponseEntity<List<JournalEntry>> getEntry(@PathVariable String userName) {
+        Optional<UsersEntry> op = userEntreyServices.findUser(userName);
+        if (op.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        return ResponseEntity.status(HttpStatus.FOUND).body(op.get().getJournalEntries());
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<JournalEntry> add(@RequestBody @Validated JournalEntry newEntry) {
+    @PostMapping("/add/{userName}")
+    public ResponseEntity<JournalEntry> add(
+            @RequestBody JournalEntry newEntry,
+            @PathVariable String userName) {
         // adds Current date and time
-        newEntry.setDate(LocalDateTime.now());
+        try {
+            journalEntryServices.saveData(newEntry, userName);
 
-        journalEntryServices.saveData(newEntry);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newEntry);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newEntry);
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @GetMapping("/id/{id}")
@@ -54,9 +68,10 @@ public class JournalEntryController222 {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
 
-    @PutMapping("/id/{id}")
+    @PutMapping("/id/{userName}/{id}")
     public ResponseEntity<JournalEntry> update(
             @PathVariable ObjectId id,
+            @PathVariable String userName,
             @RequestBody JournalEntry entry) {
 
         Optional<JournalEntry> optional = journalEntryServices.findById(id);
@@ -74,7 +89,7 @@ public class JournalEntryController222 {
             old.setContent(entry.getContent());
         }
 
-        journalEntryServices.saveData(old);
+        journalEntryServices.saveData(old, userName);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(old);
     }
