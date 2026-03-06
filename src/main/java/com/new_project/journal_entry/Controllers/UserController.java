@@ -38,28 +38,38 @@ public class UserController {
     @PostMapping("/new")
     public ResponseEntity<UsersEntry> add(@RequestBody UsersEntry newEntry) {
 
-        Optional<UsersEntry> optional = userEntryServices.findUser(newEntry.getUserName());
-        if (!optional.isEmpty()) {
+        try {
+            Optional<UsersEntry> optional = userEntryServices.findUser(newEntry.getUserName());
+            if (!optional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+            userEntryServices.saveData(newEntry);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newEntry);
+
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        userEntryServices.saveData(newEntry);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newEntry);
     }
 
     @GetMapping("/username/{username}")
     public ResponseEntity<UsersEntry> getById(@PathVariable String username) {
-        Optional<UsersEntry> optional = userEntryServices.findUser(username);
-        if (optional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        try {
+            Optional<UsersEntry> optional = userEntryServices.findUser(username);
+            if (optional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
 
-        return ResponseEntity.status(HttpStatus.FOUND).body(userEntryServices.findUser(username).orElse(null));
+            return ResponseEntity.status(HttpStatus.FOUND).body(userEntryServices.findUser(username).orElse(null));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
-    @DeleteMapping("/delete/{user}")
-    public ResponseEntity<UsersEntry> deleteUser(@PathVariable String user) {
-        Optional<UsersEntry> optional = userEntryServices.findUser(user);
+    @DeleteMapping("/delete/{userName}")
+    public ResponseEntity<UsersEntry> deleteUser(@PathVariable String userName) {
+        Optional<UsersEntry> optional = userEntryServices.findUser(userName);
         if (optional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -68,25 +78,33 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<UsersEntry> updateUser(@RequestBody UsersEntry user) {
-        Optional<UsersEntry> optional = userEntryServices.findUser(user.getUserName());
-        if (optional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    @PutMapping("/update/{userName}")
+    public ResponseEntity<UsersEntry> updateUser(
+            @PathVariable String userName,
+            @RequestBody UsersEntry user) {
+
+        try {
+            Optional<UsersEntry> optional = userEntryServices.findUser(userName);
+            if (optional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            UsersEntry oldUser = optional.get();
+
+            if (user.getUserName() != null && !user.getUserName().trim().isEmpty()) {
+                oldUser.setUserName(user.getUserName());
+            }
+
+            if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
+                oldUser.setPassword(user.getPassword());
+            }
+
+            userEntryServices.saveData(oldUser);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(oldUser);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        UsersEntry oldUser = optional.get();
-
-        if (user.getUserName() != null && !user.getUserName().trim().isEmpty()) {
-            oldUser.setUserName(user.getUserName());
-        }
-
-        if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
-            oldUser.setPassword(user.getPassword());
-        }
-
-        userEntryServices.saveData(oldUser);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(oldUser);
     }
 
 }
