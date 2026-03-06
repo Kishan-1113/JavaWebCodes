@@ -33,7 +33,6 @@ public class JournalEntryServices {
         UsersEntry user = op.get();
         user.getJournalEntries().add(saved);
         userEntreyServices.saveData(user);
-
     }
 
     public List<JournalEntry> getData() {
