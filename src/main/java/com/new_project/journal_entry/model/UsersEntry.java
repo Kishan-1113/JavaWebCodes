@@ -38,4 +38,12 @@ public class UsersEntry {
     @DBRef
     private List<JournalEntry> jrnlEntrs = new ArrayList<>();
 
+    public List<JournalEntry> getJournalEntries() {
+        return jrnlEntrs;
+    }
+
+    public void addJournalEntry(JournalEntry j) {
+        jrnlEntrs.add(j);
+    }
+
 }
