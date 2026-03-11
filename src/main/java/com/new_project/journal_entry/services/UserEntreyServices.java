@@ -14,12 +14,11 @@ import com.new_project.journal_entry.repo.UserEntryRepository;
 @Component
 public class UserEntreyServices {
 
-    
     @Autowired
     private UserEntryRepository userEntryRepository;
 
     // saves data to DB, these methods are provided by JournalEntryRepository...
-    public void saveData(@NonNull UsersEntry user) {
+    public void saveData(UsersEntry user) {
         if (user != null)
             userEntryRepository.save(user);
     }

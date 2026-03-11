@@ -24,7 +24,7 @@ public class JournalEntryServices {
     private UserEntreyServices userEntreyServices;
 
     // saves data to DB, these methods are provided by JournalEntryRepository...
-    // @Transactional
+    @Transactional
     public void saveData(JournalEntry journalEntry, String userName) {
         Optional<UsersEntry> op = userEntreyServices.findUser(userName);
 
@@ -33,7 +33,6 @@ public class JournalEntryServices {
         UsersEntry user = op.get();
         user.getJournalEntries().add(saved);
         userEntreyServices.saveData(user);
-
     }
 
     public List<JournalEntry> getData() {
