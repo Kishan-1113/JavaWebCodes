@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import com.mongodb.lang.NonNull;
 import com.new_project.journal_entry.model.UsersEntry;
 import com.new_project.journal_entry.repo.UserEntryRepository;
 
